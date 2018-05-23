@@ -1,0 +1,46 @@
+@import "~bootstrap/scss/bootstrap";
+@font-face {
+	font-family: "Josefin Slab";
+	src: url(https://fonts.googleapis.com/css?family=Josefin+Slab);
+}
+
+html,
+body {
+	min-height: 100vh;
+	min-width: 100vw;
+	font-family: "Josefin Slab" !important;
+	margin: 0; //Probably what is preventing gaps between the react buttons
+	padding: 0;
+}
+
+a {
+	color: white !important;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 2vw;
+}
+
+#wrapper {
+	max-width: 100vw;
+	width: 100vw;
+	min-height: 100vh;
+	position: relative;
+	background-color: #F1F1EF !important;
+	padding-bottom: 5vh;
+
+	#content {
+		width: 100vw;
+		max-width: 100vw;
+
+	}
+
+}
+
+
+
+
