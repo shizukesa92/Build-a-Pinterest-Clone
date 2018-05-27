@@ -1,84 +1,65 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const Book = require('./book')
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
+mongoose.Promise = require('bluebird');
 
-const userSchema = new Schema({
-	name: {
-		type: String
-	},
-	email: {
+var Schema = mongoose.Schema;
+const uri = process.env.MONGOLAB_URI;
+var db = mongoose.createConnection(uri);
+
+var UserSchema = new Schema({
+	googleID: {
 		type: String,
-		unique: true,
-		require: true
+		required: true,
+		unique: true
 	},
-	password: {
+	username: {
 		type: String,
-		require: true
+		required: true,
+		unique: true
 	},
-	city: {
-		type: String,
-		default: ''
+	pins: {
+		type: [String],
+		default: []
 	},
-	state: {
-		type: String,
-		default: ''
+	pins_liked: {
+		type: [String],
+		default: []
 	},
-	books: [{
-		type: Schema.Types.ObjectId,
-		ref: 'Book'
-	}],
-	trade_requests: [{
-		book: {
-			type: Schema.Types.ObjectId,
-			ref: 'Book'
-		},
-		for: {
-			type: Schema.Types.ObjectId,
-			ref: 'User'
-		},
-		accepted: {
-			type: Boolean,
-			default: false
-		},
-		pending: {
-			type: Boolean,
-			default: false
-		}
-	}],
-	requests_for_you: [{
-		book: {
-			type: Schema.Types.ObjectId,
-			ref: 'Book'
-		},
-		from: {
-			type: Schema.Types.ObjectId,
-			ref: 'User'
-		},
-		accept: {
-			type: Boolean,
-			default: false
-		},
-		reqid: Schema.Types.ObjectId
-	}]
-})
+	pins_repinned: {
+		type: [String],
+		default: []
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now
+	},
+});
 
-userSchema.pre('save', function(next) {
-	const user = this
-	if (!user.isModified('password')) return next()
-	bcrypt.hash(user.password, 10, function(err, hash) {
-		user.password = hash
-		next()
-	});
-})
+UserSchema.statics.findOrCreate = function(params, done) {
+	User.findOne({
+			'googleID': params.googleID
+		},
+		function(err, user) {
+			if (err) {
+				return done(err);
+			}
 
-userSchema.methods.comparePassword = function(password, done) {
-	bcrypt.compare(password, this.password, function(err, isMatch) {
-		done(err, isMatch)
-	})
-}
+			if (!user) {
+				user = new User({
+					googleID: params.googleID,
+					username: params.username || 'new user'
+				});
+				user.save(function(err) {
+					if (err)
+						return done(err, user);
+				});
+			} else {
+				//found user. Return
+				return done(err, user);
+			}
+		});
+};
 
+var User = db.model('Users', UserSchema, 'users');
 
-
-module.exports = mongoose.model('User', userSchema)
+module.exports = User;

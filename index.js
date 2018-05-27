@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const dotenv = require("dotenv").config({
@@ -10,16 +9,15 @@ const axios = require('axios')
 
 const app = express();
 
-const uri = process.env.MONGOLAB_URI;
-mongoose.connect(uri);
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-const api_route = require('./src/routes/api_route');
-const User = require('./src/models/user');
+const api_route = require('./server/routes/routes');
+const User = require('./server/models/user');
 
 app.use(logger('tiny'));
 
